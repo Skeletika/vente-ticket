@@ -18,7 +18,12 @@ exports.handler = async (event) => {
     if (quantity > 10) quantity = 10;
 
     // Check stock
-    const store = getStore({ name: "ticket-data", consistency: "strong" });
+    const store = getStore({
+      name: "ticket-data",
+      consistency: "strong",
+      siteID: process.env.NETLIFY_SITE_ID,
+      token: process.env.NETLIFY_AUTH_TOKEN,
+    });
     const stockData = await store.get("stock", { type: "json" });
 
     if (!stockData || stockData.remaining <= 0) {

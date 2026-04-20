@@ -13,7 +13,12 @@ exports.handler = async (event) => {
   };
 
   try {
-    const store = getStore({ name: "ticket-data", consistency: "strong" });
+    const store = getStore({
+      name: "ticket-data",
+      consistency: "strong",
+      siteID: process.env.NETLIFY_SITE_ID,
+      token: process.env.NETLIFY_AUTH_TOKEN,
+    });
 
     // Try to get stock from blob store
     let stockData = await store.get("stock", { type: "json" });
