@@ -63,9 +63,27 @@
                             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                         </svg>
                     </span>
-                    <span>Un problème ? <a href="mailto:voltanika.web@gmail.com">Contactez-nous</a></span>
+                    <span>Un problème ? <a href="#" id="toggleContactForm">Contactez-nous</a></span>
                 </div>
             </div>
+
+            <!-- Contact Form (Hidden by default) -->
+            <div id="contactFormContainer" class="contact-form-container" style="display: none; margin-top: 24px; text-align: left; padding: 20px; background: #F8F9FA; border-radius: 8px; border: 1px solid #E3E8EE;">
+                <h3 style="margin-top: 0; font-size: 1.1rem; color: #1a1a1a;">Envoyez-nous un message</h3>
+                <form id="contactForm">
+                    <div style="margin-bottom: 12px;">
+                        <label for="contactEmail" style="display: block; font-size: 0.9rem; margin-bottom: 4px; font-weight: 500;">Votre email</label>
+                        <input type="email" id="contactEmail" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <label for="contactMessage" style="display: block; font-size: 0.9rem; margin-bottom: 4px; font-weight: 500;">Message</label>
+                        <textarea id="contactMessage" rows="4" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; resize: vertical;"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-buy" id="submitContactBtn" style="width: 100%; padding: 10px;">Envoyer le message</button>
+                    <div id="contactFeedback" style="margin-top: 8px; font-size: 0.9rem; text-align: center;"></div>
+                </form>
+            </div>
+
             <a href="/" class="btn btn-outline-dark btn-back">← Retour à l'accueil</a>
         </div>
     </main>
@@ -81,6 +99,49 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        document.getElementById('toggleContactForm').addEventListener('click', function(e) {
+            e.preventDefault();
+            const container = document.getElementById('contactFormContainer');
+            container.style.display = container.style.display === 'none' ? 'block' : 'none';
+        });
+
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('contactEmail').value;
+            const message = document.getElementById('contactMessage').value;
+            const btn = document.getElementById('submitContactBtn');
+            const feedback = document.getElementById('contactFeedback');
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner" style="border-width: 2px; width: 14px; height: 14px; display: inline-block;"></span> Envoi...';
+            feedback.textContent = '';
+            feedback.style.color = '';
+
+            try {
+                const res = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, message })
+                });
+
+                if (res.ok) {
+                    feedback.textContent = 'Message envoyé avec succès !';
+                    feedback.style.color = 'green';
+                    document.getElementById('contactForm').reset();
+                } else {
+                    throw new Error('Erreur serveur');
+                }
+            } catch (err) {
+                feedback.textContent = 'Erreur lors de l\'envoi du message.';
+                feedback.style.color = 'red';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Envoyer le message';
+            }
+        });
+    </script>
 </body>
 
 </html>

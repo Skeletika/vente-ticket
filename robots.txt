@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://billet-nigloland.netlify.app/sitemap.xml
