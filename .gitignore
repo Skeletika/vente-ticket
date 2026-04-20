@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Environment variables (SECRETS)
+.env
+
+# Netlify local
+.netlify/
+
+# PHP legacy (can be removed after migration)
+vendor/
+composer.lock
+
+# Logs
+logs.txt
+
+# OS
+.DS_Store
+Thumbs.db

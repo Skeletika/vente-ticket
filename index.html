@@ -39,8 +39,8 @@
             </div>
 
             <div class="product-details-col">
-                <h1 class="product-title">Billet Nigloland non daté</h1>
-                <p class="product-subtitle">Billet officiel physique • Valable pour adulte ou enfant</p>
+                <h1 class="product-title">Billet Nigloland - Saison 2026 - non daté</h1>
+                <p class="product-subtitle">Billet officiel • Valable pour adulte ou enfant</p>
 
                 <hr class="divider">
 
@@ -49,13 +49,13 @@
                     <span class="price-amount">35,00 €</span>
                     <span class="discount-badge">-18%</span>
                 </div>
-                <p class="price-justification">Billet non daté, offrant plus de flexibilité qu’un billet standard.</p>
+                <p class="price-justification">Billet non daté, offrant plus de flexibilité qu'un billet standard.</p>
 
                 <div class="product-description">
                     <p>Découvrez notre offre de billets physiques pour le parc d'attractions Nigloland. Conçus pour vous
                         offrir une flexibilité totale lors de l'organisation de votre séjour.</p>
                     <ul class="features-list">
-                        <li><strong>Billet physique officiel</strong> – Garanti authentique pour l'accès au parc.</li>
+                        <li><strong>Billet officiel</strong> – Garanti authentique pour l'accès au parc.</li>
                         <li><strong>Non daté</strong> – Utilisable le jour de votre choix durant la saison en cours.
                         </li>
                         <li><strong>Public</strong> – Entrée valide pour adulte ou enfant.</li>
@@ -66,16 +66,27 @@
             <div class="product-buy-col">
                 <div class="buy-box">
                     <div class="buy-box-price">35,00 €</div>
-                    <div class="stock-status">En stock (10 disponibles)</div>
 
-                    <div class="delivery-info">
-                        <span class="delivery-label">Expédition :</span> Par courrier suivis
+                    <!-- Stock loaded dynamically -->
+                    <div class="stock-status" id="stockStatus">
+                        <span class="stock-loading">
+                            <span class="spinner"></span> Chargement du stock…
+                        </span>
                     </div>
 
-                    <a href="https://buy.stripe.com/your-link" target="_blank" rel="noopener noreferrer"
-                        class="btn btn-buy">
-                        Acheter maintenant
-                    </a>
+                    <div class="delivery-info">
+                        <span class="delivery-label">Expédition :</span>Dans votre boite mail
+                    </div>
+                    <div class="quantity-block">
+                        <label for="qty" class="qty-label">Quantité</label>
+                        <input type="number" id="qty" min="1" max="10" value="1" disabled>
+                        <div class="qty-error" id="qtyError"></div>
+                    </div>
+
+                    <!-- Button state managed by JS -->
+                    <button disabled class="btn btn-buy" id="buyBtn">
+                        <span class="spinner"></span> Chargement…
+                    </button>
 
                     <div class="secure-payment">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
@@ -114,7 +125,7 @@
                         <h3 class="step-title">Renseignement des coordonnées</h3>
                     </div>
                     <div class="step-body">
-                        L’acheteur fournit ses informations de livraison après le paiement.
+                        L'acheteur fournit ses informations de livraison après le paiement.
                     </div>
                 </div>
 
@@ -124,7 +135,7 @@
                         <h3 class="step-title">Envoi des billets</h3>
                     </div>
                     <div class="step-body">
-                        Les billets physiques sont envoyés par courrier ou remis en main propre.
+                        Les billets sont envoyés par mail à votre adresse email.
                     </div>
                 </div>
             </div>
@@ -136,14 +147,92 @@
         <div class="container footer-content">
             <div class="footer-brand">Volta</div>
             <div class="footer-details">
-                <p>Vente de billets physiques pour parcs d'attractions.</p>
+                <p>Vente de billets pour parcs d'attractions.</p>
                 <p><a href="mailto:voltanika.web@gmail.com" class="footer-link">voltanika.web@gmail.com</a></p>
-                <p class="legal-mention">Vente de billets physiques - envoi au format postal après paiement ou remise en
-                    main propre selon modalités. Les billets ne sont pas nominatifs.</p>
+                <p class="legal-mention">Vente de billets - envoi au format numérique à l'adresse email renseignée.
+                    Les billets ne sont pas nominatifs.</p>
                 <p class="copyright">&copy; 2026 Volta.</p>
             </div>
         </div>
     </footer>
+
+    <script>
+        // =====================================================
+        // 🎯 STOCK LOADING & BUY BUTTON
+        // =====================================================
+        const qtyInput = document.getElementById("qty");
+        const errorEl = document.getElementById("qtyError");
+        const buyBtn = document.getElementById("buyBtn");
+        const stockStatus = document.getElementById("stockStatus");
+
+        let maxStock = 0;
+
+        // Fetch stock from serverless function
+        async function loadStock() {
+            try {
+                const res = await fetch("/api/get-stock");
+                const data = await res.json();
+                maxStock = data.remaining;
+
+                if (maxStock <= 0) {
+                    stockStatus.innerHTML = '<span class="stock-out">Rupture de stock</span>';
+                    buyBtn.textContent = "Rupture de stock";
+                    buyBtn.disabled = true;
+                    qtyInput.disabled = true;
+                } else {
+                    stockStatus.innerHTML = `En stock (${maxStock} disponibles)`;
+                    buyBtn.textContent = "Acheter";
+                    buyBtn.disabled = false;
+                    qtyInput.disabled = false;
+                    qtyInput.max = maxStock;
+                }
+            } catch (err) {
+                stockStatus.innerHTML = '<span class="stock-error">Erreur de chargement</span>';
+                buyBtn.textContent = "Indisponible";
+                buyBtn.disabled = true;
+            }
+        }
+
+        loadStock();
+
+        // =====================================================
+        // 🛒 BUY BUTTON → CREATE CHECKOUT
+        // =====================================================
+        buyBtn.addEventListener("click", async function (e) {
+            e.preventDefault();
+
+            if (buyBtn.disabled) return;
+
+            const qty = parseInt(qtyInput.value);
+
+            // Validation
+            if (isNaN(qty) || qty < 1 || qty > maxStock) {
+                errorEl.textContent = "Veuillez choisir entre 1 et " + maxStock + " billets.";
+                return;
+            }
+
+            errorEl.textContent = "";
+
+            // Disable button and show loading
+            buyBtn.disabled = true;
+            buyBtn.innerHTML = '<span class="spinner"></span> Redirection…';
+
+            try {
+                const res = await fetch("/api/create-checkout?qty=" + qty);
+                const data = await res.json();
+
+                if (data.url) {
+                    window.location.href = data.url;
+                } else {
+                    throw new Error(data.error || "Erreur inconnue");
+                }
+            } catch (err) {
+                errorEl.textContent = "Erreur : " + err.message;
+                buyBtn.disabled = false;
+                buyBtn.textContent = "Acheter";
+            }
+        });
+    </script>
 </body>
 
 </html>

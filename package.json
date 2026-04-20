@@ -1,0 +1,18 @@
+{
+  "name": "vente-ticket",
+  "version": "1.0.0",
+  "description": "Vente de billets Nigloland - Volta",
+  "private": true,
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo 'Static site, no build needed'"
+  },
+  "dependencies": {
+    "stripe": "^17.0.0",
+    "@netlify/blobs": "^8.0.0",
+    "nodemailer": "^6.9.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^18.0.0"
+  }
+}
