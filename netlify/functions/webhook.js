@@ -65,7 +65,7 @@ exports.handler = async (event) => {
     // 📦 2. STOCK MANAGEMENT
     // ==================================================
     let stockData = await store.get("stock", { type: "json" });
-    if (!stockData) stockData = { remaining: 10 };
+    if (!stockData) stockData = { remaining: 8 };
 
     if (stockData.remaining < quantity) {
       console.error(`STOCK INSUFFISANT for ${sessionId}`);

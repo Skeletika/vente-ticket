@@ -1,5 +1,5 @@
 // =====================================================
-// 🔄 RESET STOCK — Resets stock to 10 and clears used tickets
+// 🔄 RESET STOCK — Resets stock to 8 and clears used tickets
 // =====================================================
 const { getStore } = require("@netlify/blobs");
 
@@ -19,7 +19,7 @@ exports.handler = async (event) => {
     });
 
     // Reset stock to 10
-    await store.setJSON("stock", { remaining: 10 });
+    await store.setJSON("stock", { remaining: 8 });
     
     // Clear used tickets
     await store.setJSON("used_tickets", { used: [] });
@@ -28,7 +28,7 @@ exports.handler = async (event) => {
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: "Stock réinitialisé avec succès à 10 billets." }),
+      body: JSON.stringify({ message: "Stock réinitialisé avec succès à 8 billets." }),
     };
   } catch (error) {
     console.error("Error resetting stock:", error);

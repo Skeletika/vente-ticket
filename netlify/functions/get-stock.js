@@ -3,7 +3,7 @@
 // =====================================================
 const { getStore } = require("@netlify/blobs");
 
-const INITIAL_STOCK = 10;
+const INITIAL_STOCK = 8;
 
 exports.handler = async (event) => {
   // CORS headers

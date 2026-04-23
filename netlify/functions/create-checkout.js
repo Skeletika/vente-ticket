@@ -57,7 +57,7 @@ exports.handler = async (event) => {
             product_data: {
               name: "Billet Nigloland",
             },
-            unit_amount: 3500, // 35,00 €
+            unit_amount: 3000, // 30,00 €
           },
           quantity: quantity,
         },
